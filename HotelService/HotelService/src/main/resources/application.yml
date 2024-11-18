@@ -1,0 +1,38 @@
+server:
+  port: 8092  # Replace 8091 with your desired port number
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/Hotel
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+  application:
+    name: HOTEL-SERVICE
+
+
+  config:
+    import:
+      - configserver:http://localhost:8086
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true # Set to true to see SQL statements in logs
+
+#eureka:
+ # instance:
+  #  prefer-ip-address: true
+  #client:
+   # fetch-registry: true
+    #register-with-eureka: true
+    #service-url:
+    # defaultZone: http://localhost:8761/eureka
+
+okta:
+  oauth2:
+    issuer: https://dev-06217716.okta.com/oauth2/default
+    audience: api://default
