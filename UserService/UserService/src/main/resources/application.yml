@@ -1,0 +1,103 @@
+server:
+  port: 8091  # Replace 8091 with your desired port number
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/users
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  application:
+    name: USER-SERVICE
+
+  config:
+    import:
+      - configserver:http://localhost:8086
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://dev-06217716.okta.com/oauth2/default
+      client:
+        registration:
+          my-internal-client:
+            provider: okta
+            authorizationGrantType: client_credentials
+            scope:
+              - internal
+            client-id: 0oal63i054poNZiyP5d7
+            client-secret: ZQBZhQ_3KIJgxKVFpb3qhPrF6UcopiXYi6TU_jgGLzpbXmkYQ1_YueVYsJBnm03d
+
+
+        provider:
+          okta:
+            issuerUri: https://dev-06217716.okta.com/oauth2/default
+
+  #profiles:
+   # active:
+    #  - dev
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true # Set to true to see SQL statements in logs
+
+
+#eureka:
+ # instance:
+  #  prefer-ip-address: true                as it is coming from github
+  #client:
+   # fetch-registry: true
+    #register-with-eureka: true
+    #service-url:
+    # defaultZone: http://localhost:8761/eureka
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+  endpoint:
+    health:
+      show-details: always
+
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      ratingHotelBreaker:
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 10
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 6s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+  retry:
+    instances:
+      ratingHotelService:
+        max-attempts: 3
+        wait-duration: 5s
+  ratelimiter:
+    instances:
+      userRateLimiter:
+        limit-refresh-period: 4s
+        limit-for-period: 2
+        timeout-duration: 2s
+
+okta:
+  oauth2:
+    issuer: https://dev-06217716.okta.com/oauth2/default
+    audience: api://default
+

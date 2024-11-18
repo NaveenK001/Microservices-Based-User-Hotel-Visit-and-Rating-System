@@ -1,0 +1,10 @@
+server:
+  port: 8761  # Replace 8091 with your desired port number
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+
